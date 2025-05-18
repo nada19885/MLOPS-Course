@@ -1,0 +1,48 @@
+[build-system]
+requires = ["flit_core >=3.2,<4"]
+build-backend = "flit_core.buildapi"
+
+[project]
+name = "labs"
+version = "0.0.1"
+description = "project labs"
+authors = [
+  { name = "Nada Maher" },
+]
+
+readme = "README.md"
+classifiers = [
+    "Programming Language :: Python :: 3",
+    
+]
+dependencies = [
+    "joblib>=1.5.0",
+    "mlflow>=2.22.0",
+    "pandas>=2.2.3",
+    "pip",
+    "python-dotenv",
+    "ruff",
+    "scikit-learn>=1.6.1",
+]
+requires-python = "~=3.11.0"
+
+
+[tool.ruff]
+line-length = 99
+src = ["labs"]
+include = ["pyproject.toml", "labs/**/*.py"]
+
+[tool.ruff.lint]
+extend-select = ["I"]  # Add import sorting
+
+[tool.ruff.lint.isort]
+known-first-party = ["labs"]
+force-sort-within-sections = true
+
+[dependency-groups]
+dev = [
+    "black>=25.1.0",
+    "isort>=6.0.1",
+    "ruff>=0.11.10",
+]
+
