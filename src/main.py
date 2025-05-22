@@ -1,3 +1,4 @@
+
 import os
 from pathlib import Path
 import traceback
@@ -8,63 +9,48 @@ from features.build_features import (
     get_preprocessing_pipeline,
     save_intermediate,
 )
+import hydra
+from hydra.utils import get_original_cwd
 from models.train_model import train_model
 import pandas as pd
 
 
-def main():
+@hydra.main(config_path="../../conf/pipeline", config_name="titanic", version_base="1.3")
+def main(cfg):
     print("Starting pipeline...")
+
+    # Adjust paths to account for Hydra's working directory
+    os.chdir(get_original_cwd())
     
-    # Create necessary directories if they don't exist
-    os.makedirs("data/interim", exist_ok=True)
-    os.makedirs("models", exist_ok=True)
-    
-    # Configuration (hard-coded for Lab 0)
-    data_path = "data/raw/train.csv"
-    
+    # Create necessary directories
+    os.makedirs(cfg.pipeline.data.interim_dir, exist_ok=True)
+    os.makedirs(os.path.dirname(cfg.pipeline.models[0].path), exist_ok=True)
+
     # Check if the data file exists
+    data_path = cfg.pipeline.data.raw_data_path
     if not Path(data_path).exists():
         print(f"Error: Data file not found at {data_path}")
         print("Current working directory:", os.getcwd())
         print("Please make sure the data file exists at the specified path")
         return
-        
-    numerical_features = ["Age", "SibSp", "Parch", "Fare", "family_size", "is_alone"]
-    categorical_features = ["Pclass", "Sex", "Embarked"]
-    output_paths = {
-        "feature_engineered": "data/interim/feature_engineered.pkl",
-        "processed": "data/interim/processed.pkl",
-    }
-    model_configs = [
-        {
-            "name": "logistic",
-            "params": {},
-            "path": "models/model_logistic.pkl",
-        },
-        {
-            "name": "random_forest",
-            "params": {"n_estimators": 100, "max_depth": 5},
-            "path": "models/model_random_forest.pkl",
-        },
-    ]
 
     try:
         # Load data
         print(f"Loading data from {data_path}")
         df = load_data(data_path)
         print(f"Data loaded: {df.shape}")
-        
+
+        # Engineer features
         df = engineer_features(df)
         print("Features engineered")
         print(f"Dataframe columns after engineering: {df.columns.tolist()}")
         
-        save_intermediate(df, output_paths["feature_engineered"])
-        print(f"Saved feature-engineered data to {output_paths['feature_engineered']}")
+        save_intermediate(df, cfg.pipeline.data.feature_engineered_path)
+        print(f"Saved feature-engineered data to {cfg.pipeline.data.feature_engineered_path}")
 
         # Prepare features and target
-        X = df[numerical_features + categorical_features]
+        X = df[cfg.pipeline.features.numerical + cfg.pipeline.features.categorical]
         
-        # Check if Survived column exists
         if "Survived" not in df.columns:
             print("Error: 'Survived' column not found in the dataframe")
             print(f"Available columns: {df.columns.tolist()}")
@@ -74,35 +60,32 @@ def main():
         print(f"Features and target prepared: X shape={X.shape}, y shape={y.shape}")
 
         # Preprocessing pipeline
-        pipeline = get_preprocessing_pipeline(numerical_features, categorical_features)
-        save_intermediate(pipeline, output_paths["processed"])
-        print(f"Saved preprocessing pipeline to {output_paths['processed']}")
+        pipeline = get_preprocessing_pipeline(
+            cfg.pipeline.features.numerical, cfg.pipeline.features.categorical
+        )
+        save_intermediate(pipeline, cfg.pipeline.data.processed_pipeline_path)
+        print(f"Saved preprocessing pipeline to {cfg.pipeline.data.processed_pipeline_path}")
 
         # Train and evaluate models
-        for config in model_configs:
-            print(f"Training {config['name']}...")
+        for config in cfg.pipeline.models:
+            print(f"Training {config.name}...")
             model, accuracy, report = train_model(
                 X,
                 y,
                 pipeline,
-                config["name"],
-                config["params"],
-                config["path"],
+                config.name,
+                config.params,
+                config.path,
             )
-            print(f"{config['name']} - Accuracy: {accuracy}")
+            print(f"{config.name} - Accuracy: {accuracy}")
             print(f"Classification Report:\n{report}")
-            print("Successfully trained and saved model to", config["path"])
+            print(f"Successfully trained and saved model to {config.path}")
     
     except Exception as e:
         print(f"Error occurred: {str(e)}")
         traceback.print_exc()
 
+
 if __name__ == "__main__":
     print("Executing main.py")
-    main()
-
-def main():
-    print("Running main function.")
-
-if __name__ == "__main__":
     main()

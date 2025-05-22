@@ -1,0 +1,27 @@
+pipeline:
+  data:
+    raw_data_path: data/raw/train.csv
+    interim_dir: data/interim
+    feature_engineered_path: data/interim/feature_engineered.pkl
+    processed_pipeline_path: data/interim/processed.pkl
+  features:
+    numerical:
+    - Age
+    - SibSp
+    - Parch
+    - Fare
+    - family_size
+    - is_alone
+    categorical:
+    - Pclass
+    - Sex
+    - Embarked
+  models:
+  - name: logistic
+    params: {}
+    path: models/model_logistic.pkl
+  - name: random_forest
+    params:
+      tune: true
+      n_trials: 20
+    path: models/model_random_forest.pkl

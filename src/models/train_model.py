@@ -7,7 +7,7 @@ from sklearn.pipeline import Pipeline
 import joblib
 
 
-def train_model(X, y, pipeline, model_name='logistic', params={}, model_path='models/model.pkl'):
+def train_model(X, y, pipeline,model_name,model_path, params={}):
     """
     Train and evaluate a machine learning model.
     

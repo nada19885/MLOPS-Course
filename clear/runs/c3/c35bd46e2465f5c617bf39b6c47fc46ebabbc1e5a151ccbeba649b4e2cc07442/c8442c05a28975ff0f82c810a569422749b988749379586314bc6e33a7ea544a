@@ -1,0 +1,23 @@
+cmd: uv run python src/process_data.py
+deps:
+- path: conf/pipeline/titanic.yaml
+  hash: md5
+  md5: 242096b34f9f2290d6e7072c6e7e13e5
+  size: 552
+- path: data/raw/train.csv
+  hash: md5
+  md5: 2309cc5f04782ed9bb6016d9f4e381cf
+  size: 61194
+- path: src/process_data.py
+  hash: md5
+  md5: f38b8f6037247b7e6730f673909363d0
+  size: 2456
+outs:
+- path: data/interim/feature_engineered.pkl
+  hash: md5
+  md5: 091d0b9a53d9951e019131f21f2fd0c8
+  size: 116598
+- path: data/interim/processed.pkl
+  hash: md5
+  md5: 0733a01bedf0a0f9b4108ed961462d6d
+  size: 1062

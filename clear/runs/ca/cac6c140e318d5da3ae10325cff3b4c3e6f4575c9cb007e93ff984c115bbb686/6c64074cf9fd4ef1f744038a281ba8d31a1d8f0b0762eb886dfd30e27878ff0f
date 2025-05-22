@@ -1,0 +1,27 @@
+cmd: uv run python src/train_model.py
+deps:
+- path: conf/pipeline/titanic.yaml
+  hash: md5
+  md5: 242096b34f9f2290d6e7072c6e7e13e5
+  size: 552
+- path: data/interim/feature_engineered.pkl
+  hash: md5
+  md5: 091d0b9a53d9951e019131f21f2fd0c8
+  size: 116598
+- path: data/interim/processed.pkl
+  hash: md5
+  md5: 0733a01bedf0a0f9b4108ed961462d6d
+  size: 1062
+- path: src/models/train_model.py
+  hash: md5
+  md5: 1d57faa41a4c642ecf8703174dcceb85
+  size: 1826
+outs:
+- path: models/model_logistic.pkl
+  hash: md5
+  md5: 80e7d87dd119faab212672f93bbe9bbe
+  size: 4970
+- path: models/model_random_forest.pkl
+  hash: md5
+  md5: 14c2948e14c6daa5d678b907c63596bf
+  size: 2472427

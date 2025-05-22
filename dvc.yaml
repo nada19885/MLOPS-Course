@@ -1,0 +1,21 @@
+stages:
+  processing:
+    cmd: uv run python src/process_data.py
+    deps:
+    - data/raw/train.csv
+    - src/process_data.py
+    - conf/pipeline/titanic.yaml
+    outs:
+    - data/interim/processed.pkl
+    - data/interim/feature_engineered.pkl
+    
+  train_model:
+    cmd: uv run python src/train_model.py
+    deps:
+    - data/interim/feature_engineered.pkl
+    - data/interim/processed.pkl
+    - src/models/train_model.py
+    - conf/pipeline/titanic.yaml
+    outs:
+    - models/model_logistic.pkl
+    - models/model_random_forest.pkl

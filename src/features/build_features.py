@@ -5,7 +5,6 @@ from sklearn.impute import SimpleImputer
 from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import OneHotEncoder, StandardScaler
 
-
 def engineer_features(df: pd.DataFrame) -> pd.DataFrame:
     """
     Engineer features from the input dataframe.
@@ -26,7 +25,6 @@ def engineer_features(df: pd.DataFrame) -> pd.DataFrame:
     print(f"Feature engineering completed. New columns: {df.columns.tolist()}")
     return df
 
-
 def get_preprocessing_pipeline(numerical_features, categorical_cols):
     """
     Create a preprocessing pipeline for numerical and categorical features.
@@ -38,7 +36,11 @@ def get_preprocessing_pipeline(numerical_features, categorical_cols):
     Returns:
         ColumnTransformer: Preprocessing pipeline
     """
-    print(f"Creating preprocessing pipeline for {len(numerical_features)} numerical and {len(categorical_cols)} categorical features")
+    # Convert inputs to plain Python lists to avoid Hydra ListConfig issues
+    numerical_features = list(numerical_features)
+    categorical_cols = list(categorical_cols)
+    
+    print(f"Creating preprocessing pipeline for numerical: {numerical_features}, categorical: {categorical_cols}")
     
     numeric_pipeline = Pipeline(steps=[
         ("imputer", SimpleImputer(strategy="mean")),
@@ -50,13 +52,14 @@ def get_preprocessing_pipeline(numerical_features, categorical_cols):
         ("onehot", OneHotEncoder(handle_unknown="ignore")),
     ])
     
-    return ColumnTransformer(
+    preprocessor = ColumnTransformer(
         transformers=[
             ("num", numeric_pipeline, numerical_features),
             ("cat", categorical_pipeline, categorical_cols),
         ]
     )
-
+    
+    return preprocessor
 
 def save_intermediate(obj, path: str):
     """
